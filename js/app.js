@@ -64,7 +64,7 @@ $('#modalDownloadS2').on('hidden.bs.modal', function () {
         $(this).removeClass('on');
     });
     $("#modalDownloadS2 .dropdown-menu li a").first().addClass("on");
-    $("#modalDownloadS2 .dropdown .btn:first-child").html($("#modalDownloadL8 .dropdown-menu li a").first().text() + ' <span class="caret"></span>');
+    $("#modalDownloadS2 .dropdown .btn:first-child").html($("#modalDownloadS2 .dropdown-menu li a").first().text() + ' <span class="caret"></span>');
 });
 
 $(function () {
