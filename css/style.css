@@ -5,31 +5,53 @@ body {
 	font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
 	color: #000;
 	background-color: #FFF;
+    letter-spacing: 0;
 }
 
 .content {
     height:100%;
     width: 100%;
+    font-size: 0;
 }
 
 .row, .col {
     padding: 0;
     margin: 0;
 }
+
 .center {
-    padding: 5px;
-    margin: auto
+    padding: 20px;
+    margin: auto;
 }
+
 .display-none {
     display: none;
 }
 
-.map {
+.site-info {
+    display: none;
+    background-color: #FFF;
+    color: #000;
     height: 100%;
-    z-index: 0;
     padding: 0;
     margin: 0;
-    display: block;
+    font-size: 0;
+}
+
+.main-container {
+    height:100%;
+    width: 100%;
+    font-size: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.map {
+    display: inline-block;
+    height: 100%;
+    width: 80%;
+    padding: 0;
+    margin: 0;
     -webkit-touch-callout: none;
       -webkit-user-select: none;
          -moz-user-select: none;
@@ -38,13 +60,69 @@ body {
 }
 
 .info-img {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
     height: 100%;
-    z-index: 1;
+    width: 20%;
     color: #000;
     background-color: #dde3f2;
     margin: 0;
     padding: 0;
     overflow-y: auto;
+}
+
+.site-info.in {
+    display: inline-block;
+    width: 40%;
+}
+
+.site-info.in  ~ .main-container {
+    display: inline-block;
+    width: 60%;
+    vertical-align: top;
+}
+
+.site-info.in  ~ .main-container .map {
+    display: block;
+    height: calc(100% - 70px);
+    width: 100%;
+}
+
+.site-info.in ~ .main-container .info-img {
+    display: block;
+    width: 100%;
+    height: 70px;
+    background-color: #000;
+}
+
+.site-info.in ~ .main-container .img-thumb{
+    display: none;
+}
+
+.site-info .info {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    font-size: 12px;
+    padding: 20px;
+    text-align: justify;
+}
+
+.site-info .info h4 {
+    text-decoration: underline;
+}
+
+.site-info .info blockquote {
+    font-size: 10px;
+    color: rgb(103, 103, 103);
+    text-align: justify;
+}
+
+.site-info .info .thanks-images {
+    max-width: 600px;
 }
 
 .block-control-map {
@@ -104,6 +182,7 @@ body {
 }
 
 .list-img {
+    position: relative;
     width: 100%;
     height: 100%;
     overflow-y: scroll;
@@ -121,7 +200,7 @@ body {
 }
 
 .list-img .list-element .col {
-    padding: 5px 20px;
+    padding: 5px 5px;
     height: 60px;
     white-space: nowrap;
     width: 100%;
@@ -367,6 +446,53 @@ body {
     padding: 15px;
 }
 
+
+.button-inline button{
+    display: inline-block;
+}
+
+.button-inline button.btn-download {
+    color: #FFF;
+    background-color: rgb(83, 85, 85);
+}
+
+.button-inline button.btn-download i,
+.button-inline a.btn-download {
+    display: none;
+}
+
+.button-inline button.btn-download.processing {
+    cursor: default;
+    pointer-events: none;
+    color: #000;
+    background-color: rgb(157, 157, 157);
+}
+
+.button-inline button.btn-download.processing span {
+    display: none;
+}
+
+.button-inline button.btn-download.processing i {
+    display: inherit;
+}
+
+.button-inline button.btn-download.ready {
+    display: none;
+}
+
+.button-inline button.btn-download.ready ~ a.btn-download {
+    color: #FFF;
+    background-color: rgb(58, 158, 62);
+    display: inline-block;
+}
+
+.button-inline button.btn-download.error {
+    cursor: not-allowed;
+    pointer-events: none;
+    color: #FFF;
+    background-color: rgb(176, 52, 35);
+}
+
 .img-ovr .dropdown{
     z-index: 10000;
 }
@@ -486,12 +612,33 @@ body {
     text-align: right;
 }
 
+@media(max-width: 1000px){
+    .map {
+        width: 70%;
+    }
+
+    .info-img {
+        width: 30%;
+    }
+}
+
 @media(max-width: 767px){
+    .site-info.in {
+        width: 100%;
+    }
+
+    .site-info.in ~ .main-container {
+        display: none;
+    }
+
     .img-preview .item{
     	width: 100%;
     }
+
     .map {
         height: calc(100% - 70px);
+        width: 100%;
+        display: block;
     }
 
     .leaflet-control-attribution,
@@ -509,10 +656,16 @@ body {
         padding: 0;
         overflow-y: auto;
     }
+
     .list-img .list-element .img-thumb{
         display: none;
     }
-    .dwn-bands *{
+
+    .dwn-bands * {
         font-size: 10px;
+    }
+
+    .site-info .info ul {
+        padding-left: 20px;
     }
 }
