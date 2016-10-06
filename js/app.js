@@ -31,6 +31,17 @@ $('#modalPreview').on('hidden.bs.modal', function () {
 $('#modalDownloadL8').on('shown.bs.modal', function () {
     "use strict";
     $("#modalDownloadL8 .dwn-bands").focus();
+
+    $("#modalDownloadL8 .btn-download").removeClass("processing");
+    $("#modalDownloadL8 .btn-download").removeClass("error");
+    $("#modalDownloadL8 .btn-download").removeClass("ready");
+    $("#modalDownloadL8 .btn-download span").text('Download');
+    $("#modalDownloadL8 .btn-download a").attr('href', '');
+    $("#modalDownloadL8 .dropdown-menu li a").each(function () {
+        $(this).removeClass('on');
+    });
+    $("#modalDownloadL8 .dropdown-menu li a").first().addClass("on");
+    $("#modalDownloadL8 .dropdown .btn:first-child").html($("#modalDownloadL8 .dropdown-menu li a").first().text() + ' <span class="caret"></span>');
 });
 
 $('#modalDownloadL8').on('hidden.bs.modal', function () {
@@ -39,18 +50,16 @@ $('#modalDownloadL8').on('hidden.bs.modal', function () {
     $('#modalDownloadL8 .dwn-bands').empty();
     $('#modalDownloadL8 .overview').attr('data-id', '');
     $('#modalDownloadL8 .overview').html('<span><i class="fa fa-spinner fa-spin"></i></span>');
-
-    $("#modalDownloadL8 .dropdown-menu li a").each(function () {
-        $(this).removeClass('on');
-    });
-    $("#modalDownloadL8 .dropdown-menu li a").first().addClass("on");
-    $("#modalDownloadL8 .dropdown .btn:first-child").html($("#modalDownloadL8 .dropdown-menu li a").first().text() + ' <span class="caret"></span>');
-
 });
 
 $('#modalDownloadS2').on('shown.bs.modal', function () {
     "use strict";
     $("#modalDownloadS2 .dwn-bands").focus();
+    $("#modalDownloadS2 .dropdown-menu li a").each(function () {
+        $(this).removeClass('on');
+    });
+    $("#modalDownloadS2 .dropdown-menu li a").first().addClass("on");
+    $("#modalDownloadS2 .dropdown .btn:first-child").html($("#modalDownloadS2 .dropdown-menu li a").first().text() + ' <span class="caret"></span>');
 });
 
 $('#modalDownloadS2').on('hidden.bs.modal', function () {
@@ -59,12 +68,6 @@ $('#modalDownloadS2').on('hidden.bs.modal', function () {
     $('#modalDownloadS2 .dwn-bands').empty();
     $('#modalDownloadS2 .overview').attr('data-id', '');
     $('#modalDownloadS2 .overview').html('<span><i class="fa fa-spinner fa-spin"></i></span>');
-
-    $("#modalDownloadS2 .dropdown-menu li a").each(function () {
-        $(this).removeClass('on');
-    });
-    $("#modalDownloadS2 .dropdown-menu li a").first().addClass("on");
-    $("#modalDownloadS2 .dropdown .btn:first-child").html($("#modalDownloadS2 .dropdown-menu li a").first().text() + ' <span class="caret"></span>');
 });
 
 $(function () {
@@ -108,6 +111,13 @@ $(function () {
     "use strict";
 
     $("#modalDownloadL8 .dropdown-menu li a").click(function () {
+
+        $("#modalDownloadL8 .btn-download").removeClass("processing");
+        $("#modalDownloadL8 .btn-download").removeClass("error");
+        $("#modalDownloadL8 .btn-download").removeClass("ready");
+        $("#modalDownloadL8 .btn-download span").text('Download');
+        $("#modalDownloadL8 .btn-download a").attr('href', '');
+
         $('#modalDownloadL8 .overview').html('<span><i class="fa fa-spinner fa-spin"></i></span>');
         $("#modalDownloadL8 .dropdown .btn:first-child").html($(this).text() + ' <span class="caret"></span>');
 
@@ -135,6 +145,41 @@ $(function () {
 
     });
 });
+
+function landsatdownload() {
+    "use strict";
+
+    $("#modalDownloadL8 button.btn-download").addClass("processing");
+
+    var req = {
+        scene: $('#modalDownloadL8 .overview').attr("data-id"),
+        bands: $("#modalDownloadL8 .dropdown-menu li .on").parent().attr("data-bands")
+    };
+
+    $.post("https://npj2g2bwcc.execute-api.us-west-2.amazonaws.com/landsat/toa", JSON.stringify(req))
+        .done(function (data) {
+            if (!(data.hasOwnProperty('errorMessage'))) {
+                $("#modalDownloadL8 button.btn-download").removeClass("processing");
+                $("#modalDownloadL8 button.btn-download").addClass("ready");
+                $("#modalDownloadL8 a.btn-download").attr('href', data.path);
+            } else {
+                $("#modalDownloadL8 button.btn-download").removeClass("processing");
+                $("#modalDownloadL8 button.btn-download").addClass("error");
+                $("#modalDownloadL8 button.btn-download span").text('Error');
+            }
+        })
+        .fail(function (error, data) {
+            $("#modalDownloadL8 button.btn-download").removeClass("processing");
+            $("#modalDownloadL8 button.btn-download").addClass("error");
+            $("#modalDownloadL8 button.btn-download span").text('Error');
+        });
+}
+
+function showSiteInfo() {
+    'use strict';
+    $('.site-info').toggleClass('in');
+    window.dispatchEvent(new Event('resize'));
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //From Libra by developmentseed (https://github.com/developmentseed/libra)
@@ -269,6 +314,7 @@ function buildQueryAndRequestL8(features) {
                 scene.usgsURL = data.results[i].cartURL;
                 scene.sceneID = data.results[i].scene_id;
                 scene.AWSurl = 'http://landsat-pds.s3.amazonaws.com/L8/' + zeroPad(data.results[i].path, 3) + '/' + zeroPad(data.results[i].row, 3) + '/' + data.results[i].sceneID + '/';
+                scene.sumAWSurl = 'https://landsatonaws.com/L8/' + zeroPad(data.results[i].path, 3) + '/' + zeroPad(data.results[i].row, 3) + '/' + data.results[i].sceneID;
 
                 if (results.hasOwnProperty(scene.grid)) {
                     results[scene.grid].push(scene);
@@ -367,7 +413,6 @@ function feeddownloadS2(elem, preview) {
     );
 
     $('#modalDownloadS2 .overview').html('<img src="' + preview + '">');
-
     $('#modalDownloadS2').modal();
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -386,7 +431,8 @@ function feedPreviewL8(elem) {
                     '<span><i class="fa fa-cloud"></i> ' + res[i].cloud + '%</span>' +
                     '<span>Link:</span>' +
                     '<div class="btnDD" onclick="feeddownloadL8(\'' + res[i].AWSurl + '\',\'' + res[i].sceneID + '\')"><i class="fa fa-download"></i></div>' +
-                    '<a target="_blank" href="' + res[i].AWSurl + 'index.html"><img src="/img/aws.png"> </a>' +
+                    // '<a target="_blank" href="' + res[i].AWSurl + 'index.html"><img src="/img/aws.png"> </a>' +
+                    '<a target="_blank" href="' + res[i].sumAWSurl + '"><img src="/img/aws.png"> </a>' +
                     '<a target="_blank" href="' + res[i].usgsURL + '"><img src="/img/usgs.jpg"></a>' +
                 '</div>' +
                 '</div>'
@@ -432,7 +478,6 @@ function feeddownloadL8(url, id) {
         .fail(function () {
             $('#modalDownloadL8 .overview').html('<span>Preview Unavailable</span>');
         });
-
     $('#modalDownloadL8').modal();
 }
 
@@ -649,12 +694,8 @@ function addLayers() {
             },
             "filter": ["in", "PATH", ""]
         });
-
     }
-
-
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 if (!mapboxgl.supported()) {
