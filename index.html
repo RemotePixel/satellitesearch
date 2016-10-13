@@ -123,6 +123,9 @@
 					- Masks computation: cloud and land/water masks are generated.
 					- Imagery compression of the resultant Level-1C imagery via the JPEG2000 algorithm and a GML geographic imagery-encoded header.
 					<p>Info: <a href="https://sentinel.esa.int/web/sentinel/user-guides/sentinel-2-msi/processing-levels/level-1" target="_blank">https://sentinel.esa.int</a></p>
+
+					Reflectance, often between 0 and 1, is converted into integer values, in order to preserve the dynamic range of the data by applying a fixed coefficient (1000 by default).
+					<p>Info: <a href="https://sentinel.esa.int/web/sentinel/technical-guides/sentinel-2-msi/level-1c/algorithm" target="_blank">https://sentinel.esa.int</a></p>
 				</blockquote>
 
 				<h4>Contribute</h4>
