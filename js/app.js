@@ -5,7 +5,7 @@
 /*global console, console, alert*/
 
 //var sat_api = 'https://api.astrodigital.com/v2.0/search/',
-var sat_api = 'https://api.developmentseed.org/satellites?search=',
+var sat_api = 'https://api.developmentseed.org/satellites/?search=',
     scope = {
         results: {}
     };
