@@ -59,6 +59,14 @@ body {
               user-select: none;
 }
 
+.watermark {
+  position: absolute;
+  left: 45px;
+  bottom: 0;
+  background: none;
+  z-index: 1;
+}
+
 .info-img {
     position: relative;
     display: inline-block;
