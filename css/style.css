@@ -568,11 +568,11 @@ body {
 
 .bottom-right-button {
     position: absolute;
-    bottom: 0;
-    left: 0;
+    bottom: 25px;
+    right: 3px;
     text-align: center;
-    width: 50px;
-    padding: 5px;
+    width: auto;
+    padding: 0;
     height: auto;
     color: #FFF;
     z-index: 1000;
@@ -617,6 +617,12 @@ body {
     font-size: 12px;
     font-style: italic;
     text-align: right;
+}
+
+.img-responsive {
+    display: block;
+    max-width: 100%;
+    height: auto
 }
 
 @media(max-width: 1000px){
