@@ -325,7 +325,7 @@ function buildQueryAndRequestL8(features) {
 
                         scene.id = data.results[i].LANDSAT_PRODUCT_ID;
                         scene.AWSurl = `http://landsat-pds.s3.amazonaws.com/c1/L8/${scene_params.path}/${scene_params.row}/${scene.id}/`;
-                        scene.sumAWSurl = `http://landsatonaws.com/c1/L8/${scene_params.path}/${scene_params.row}/${scene.id}/`;
+                        scene.sumAWSurl = `http://landsatonaws.com/L8/${scene_params.path}/${scene_params.row}/${scene.id}/`;
                     }
 
                     if (results.hasOwnProperty(scene.grid)) {
@@ -433,7 +433,6 @@ function feedPreviewL8(elem) {
             '<div class="item">' +
                 '<img class="img-item img-responsive lazy lazyload" data-src="' + res[i].browseURL + '" class="img-responsive">' +
                 '<div class="result-overlay">' +
-                    '<span>' + res[i].sceneID + '</span>' +
                     '<span><i class="fa fa-calendar-o"></i> ' + res[i].date + '</span>' +
                     '<span><i class="fa fa-cloud"></i> ' + res[i].cloud + '%</span>' +
                     '<span>Link:</span>' +
@@ -451,20 +450,21 @@ function feeddownloadL8(url, id) {
 
     $('#modalDownloadL8 .overview').attr('data-id', id);
     $('#modalDownloadL8 .dwn-bands').append(
+        `<span>Scene ID: ${id}</span><br>` +
         '<span>Direct Download L8 band (Right Click on link)</span>' +
-            '<a id="b1" target="_blank" href="' + url + id + '_B1.TIF" download>B1 - Coastal aerosol</a>' +
-            '<a id="b2" target="_blank" href="' + url + id + '_B2.TIF" download>B2 - Blue</a>' +
-            '<a id="b3" target="_blank" href="' + url + id + '_B3.TIF" download>B3 - Green</a>' +
-            '<a id="b4" target="_blank" href="' + url + id + '_B4.TIF" download>B4 - Red</a>' +
-            '<a id="b5" target="_blank" href="' + url + id + '_B5.TIF" download>B5 - Near Infrared</a>' +
-            '<a id="b6" target="_blank" href="' + url + id + '_B6.TIF" download>B6 - Shortwave Infrared 1</a>' +
-            '<a id="b7" target="_blank" href="' + url + id + '_B7.TIF" download>B7 - Shortwave Infrared 2</a>' +
-            '<a id="b8" target="_blank" href="' + url + id + '_B8.TIF" download>B8 - Panchromatic (15m)</a>' +
-            '<a id="b9" target="_blank" href="' + url + id + '_B9.TIF" download>B9 - Cirrus</a>' +
-            '<a id="b10" target="_blank" href="' + url + id + '_B10.TIF" download>B10 - Thermal Infrared 1</a>' +
-            '<a id="b11" target="_blank" href="' + url + id + '_B11.TIF" download>B11 - Thermal Infrared 2</a>' +
-            '<a id="bQA" target="_blank" href="' + url + id + '_BQA.TIF" download>BQA - Quality Assessment</a>' +
-            '<a id="mtl" target="_blank" href="' + url + id + '_MTL.txt" download>MTL - Metadata</a>'
+        '<a id="b1" target="_blank" href="' + url + id + '_B1.TIF" download>B1 - Coastal aerosol</a>' +
+        '<a id="b2" target="_blank" href="' + url + id + '_B2.TIF" download>B2 - Blue</a>' +
+        '<a id="b3" target="_blank" href="' + url + id + '_B3.TIF" download>B3 - Green</a>' +
+        '<a id="b4" target="_blank" href="' + url + id + '_B4.TIF" download>B4 - Red</a>' +
+        '<a id="b5" target="_blank" href="' + url + id + '_B5.TIF" download>B5 - Near Infrared</a>' +
+        '<a id="b6" target="_blank" href="' + url + id + '_B6.TIF" download>B6 - Shortwave Infrared 1</a>' +
+        '<a id="b7" target="_blank" href="' + url + id + '_B7.TIF" download>B7 - Shortwave Infrared 2</a>' +
+        '<a id="b8" target="_blank" href="' + url + id + '_B8.TIF" download>B8 - Panchromatic (15m)</a>' +
+        '<a id="b9" target="_blank" href="' + url + id + '_B9.TIF" download>B9 - Cirrus</a>' +
+        '<a id="b10" target="_blank" href="' + url + id + '_B10.TIF" download>B10 - Thermal Infrared 1</a>' +
+        '<a id="b11" target="_blank" href="' + url + id + '_B11.TIF" download>B11 - Thermal Infrared 2</a>' +
+        '<a id="bQA" target="_blank" href="' + url + id + '_BQA.TIF" download>BQA - Quality Assessment</a>' +
+        '<a id="mtl" target="_blank" href="' + url + id + '_MTL.txt" download>MTL - Metadata</a>'
     );
 
     const params = {
