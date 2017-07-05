@@ -133,10 +133,10 @@ function landsatdownload() {
     };
 
     $.get(rpix_api_us + 'l8_full', params)
-        .done(function () {
+        .done(function (data) {
             $('#modalDownloadL8 button.btn-download').removeClass('processing');
-            $('#modalDownloadL8 button.btn-download').addClass('error');
-            $('#modalDownloadL8 button.btn-download span').text('Error');
+            $('#modalDownloadL8 button.btn-download').addClass('ready');
+            $('#modalDownloadL8 a.btn-download').attr('href', data.path);
         })
         .fail(function () {
             $('#modalDownloadL8 button.btn-download').removeClass('processing');
@@ -238,7 +238,7 @@ function buildQueryAndRequestS2(features) {
                     scene.sceneID = data.results[i].scene_id;
                     scene.browseURL = data.results[i].thumbnail.replace('.jp2', '.jpg');
                     scene.path = data.results[i].aws_path.replace('tiles', '#tiles');
-                    scene.AWSurl = 'http://sentinel-s2-l1c.s3-website.eu-central-1.amazonaws.com/' + scene.path + '/';
+                    scene.AWSurl = 'https://sentinel-s2-l1c.s3-website.eu-central-1.amazonaws.com/' + scene.path + '/';
                     scene.grid = scene.utm_zone + scene.latitude_band + scene.grid_square;
 
                     let key = s2_name_to_key(scene.sceneID);
@@ -316,7 +316,7 @@ function buildQueryAndRequestL8(features) {
 
                     if (moment(scene.date) < moment('2017-05-01')) {
                         scene.id = data.results[i].scene_id;
-                        scene.AWSurl = 'http://landsat-pds.s3.amazonaws.com/L8/' + zeroPad(data.results[i].path, 3) + '/' + zeroPad(data.results[i].row, 3) + '/' + data.results[i].id + '/';
+                        scene.AWSurl = 'https://landsat-pds.s3.amazonaws.com/L8/' + zeroPad(data.results[i].path, 3) + '/' + zeroPad(data.results[i].row, 3) + '/' + data.results[i].id + '/';
                         scene.sumAWSurl = 'https://landsatonaws.com/L8/' + zeroPad(data.results[i].path, 3) + '/' + zeroPad(data.results[i].row, 3) + '/' + data.results[i].sceneID;
                     } else {
                         let scene_params = parse_landsat_product_id(scene.landsat_product_ID);
@@ -324,8 +324,8 @@ function buildQueryAndRequestL8(features) {
                         scene.category = scene_params.category;
 
                         scene.id = data.results[i].LANDSAT_PRODUCT_ID;
-                        scene.AWSurl = `http://landsat-pds.s3.amazonaws.com/c1/L8/${scene_params.path}/${scene_params.row}/${scene.id}/`;
-                        scene.sumAWSurl = `http://landsatonaws.com/L8/${scene_params.path}/${scene_params.row}/${scene.id}/`;
+                        scene.AWSurl = `https://landsat-pds.s3.amazonaws.com/c1/L8/${scene_params.path}/${scene_params.row}/${scene.id}/`;
+                        scene.sumAWSurl = `https://landsatonaws.com/L8/${scene_params.path}/${scene_params.row}/${scene.id}/`;
                     }
 
                     if (results.hasOwnProperty(scene.grid)) {
