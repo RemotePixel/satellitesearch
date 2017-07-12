@@ -8,12 +8,6 @@ const sat_api_url = 'https://api.developmentseed.org/satellites/?search=';
 
 const scope = { results: {} };
 
-$('#modalGL').on('shown.bs.modal', function () {
-    setTimeout(function () {
-        window.location = 'https://remotepixel.ca/projects/satellitesearch-nogl.html';
-    }, 3000);
-});
-
 $('#modalPreview').on('shown.bs.modal', function () {
     $('.img-preview').focus();
 });
@@ -56,72 +50,66 @@ $('#modalDownloadS2').on('shown.bs.modal', function () {
 });
 
 $('#modalDownloadS2').on('hidden.bs.modal', function () {
-
     $('#modalPreview').focus();
     $('#modalDownloadS2 .dwn-bands').empty();
     $('#modalDownloadS2 .overview').attr('data-id', '');
     $('#modalDownloadS2 .overview').html('<span><i class="fa fa-spinner fa-spin"></i></span>');
 });
 
-$(function () {
-    $('#modalDownloadS2 .dropdown-menu li a').click(function () {
-        $('#modalDownloadS2 .overview').html('<span><i class="fa fa-spinner fa-spin"></i></span>');
-        $('#modalDownloadS2 .dropdown .btn:first-child').html($(this).text() + ' <span class="caret"></span>');
+$('#modalDownloadS2 .dropdown-menu li a').click(function () {
+    $('#modalDownloadS2 .overview').html('<span><i class="fa fa-spinner fa-spin"></i></span>');
+    $('#modalDownloadS2 .dropdown .btn:first-child').html($(this).text() + ' <span class="caret"></span>');
 
-        const params = {
-            scene: $('#modalDownloadS2 .overview').attr('data-id'),
-            bands: $(this).parent().attr('data-bands')
-        };
+    const params = {
+        scene: $('#modalDownloadS2 .overview').attr('data-id'),
+        bands: $(this).parent().attr('data-bands')
+    };
 
-        if (params.bands === ['04','03','02']) {
-            $('#modalDownloadS2 .overview').html('<img src="' + $('#modalDownloadS2 .overview').attr('data-prev') + '">');
-        } else {
-            $.get(rpix_api_eu + 's2_overview', params)
-                .done(function (data) {
-                    $('#modalDownloadS2 .overview').html('<img src="data:image/png;base64,' + data + '">');
-                })
-                .fail(function () {
-                    $('#modalDownloadS2 .overview').html('<span>Preview Unavailable</span>');
-                });
-        }
-
-        $('#modalDownloadS2 .dropdown-menu li a').each(function () {
-            $(this).removeClass('on');
-        });
-        $(this).addClass('on');
-    });
-});
-
-
-$(function () {
-    $('#modalDownloadL8 .dropdown-menu li a').click(function () {
-        $('#modalDownloadL8 .btn-download').removeClass('processing');
-        $('#modalDownloadL8 .btn-download').removeClass('error');
-        $('#modalDownloadL8 .btn-download').removeClass('ready');
-        $('#modalDownloadL8 .btn-download span').text('Download');
-        $('#modalDownloadL8 .btn-download a').attr('href', '');
-        $('#modalDownloadL8 .overview').html('<span><i class="fa fa-spinner fa-spin"></i></span>');
-        $('#modalDownloadL8 .dropdown .btn:first-child').html($(this).text() + ' <span class="caret"></span>');
-
-        const params = {
-            scene: $('#modalDownloadL8 .overview').attr('data-id'),
-            bands: $(this).parent().attr('data-bands')
-        };
-
-        $.get(rpix_api_us + 'l8_overview', params )
+    if (params.bands === ['04','03','02']) {
+        $('#modalDownloadS2 .overview').html('<img src="' + $('#modalDownloadS2 .overview').attr('data-prev') + '">');
+    } else {
+        $.get(rpix_api_eu + 's2_overview', params)
             .done(function (data) {
-                $('#modalDownloadL8 .overview').html('<img src="data:image/png;base64,' + data + '">');
+                $('#modalDownloadS2 .overview').html('<img src="data:image/png;base64,' + data + '">');
             })
             .fail(function () {
-                $('#modalDownloadL8 .overview').html('<span>Preview Unavailable</span>');
+                $('#modalDownloadS2 .overview').html('<span>Preview Unavailable</span>');
             });
+    }
 
-        $('#modalDownloadL8 .dropdown-menu li a').each(function () {
-            $(this).removeClass('on');
-        });
-        $(this).addClass('on');
-
+    $('#modalDownloadS2 .dropdown-menu li a').each(function () {
+        $(this).removeClass('on');
     });
+    $(this).addClass('on');
+});
+
+$('#modalDownloadL8 .dropdown-menu li a').click(function () {
+    $('#modalDownloadL8 .btn-download').removeClass('processing');
+    $('#modalDownloadL8 .btn-download').removeClass('error');
+    $('#modalDownloadL8 .btn-download').removeClass('ready');
+    $('#modalDownloadL8 .btn-download span').text('Download');
+    $('#modalDownloadL8 .btn-download a').attr('href', '');
+    $('#modalDownloadL8 .overview').html('<span><i class="fa fa-spinner fa-spin"></i></span>');
+    $('#modalDownloadL8 .dropdown .btn:first-child').html($(this).text() + ' <span class="caret"></span>');
+
+    const params = {
+        scene: $('#modalDownloadL8 .overview').attr('data-id'),
+        bands: $(this).parent().attr('data-bands')
+    };
+
+    $.get(rpix_api_us + 'l8_overview', params )
+        .done(function (data) {
+            $('#modalDownloadL8 .overview').html('<img src="data:image/png;base64,' + data + '">');
+        })
+        .fail(function () {
+            $('#modalDownloadL8 .overview').html('<span>Preview Unavailable</span>');
+        });
+
+    $('#modalDownloadL8 .dropdown-menu li a').each(function () {
+        $(this).removeClass('on');
+    });
+    $(this).addClass('on');
+
 });
 
 function landsatdownload() {
@@ -534,7 +522,7 @@ function addLayers() {
             'source-layer': 'Sentinel2_Grid_Centroid',
             'paint': {
                 'circle-color': 'hsl(207, 84%, 57%)',
-                'circle-opacity': 0.4,
+                'circle-opacity': 0.7,
                 'circle-radius': 21
             },
             'minzoom': 4.3
@@ -566,7 +554,7 @@ function addLayers() {
             },
             'paint': {
                 'text-color': 'hsl(0, 0%, 100%)',
-                'text-opacity': 0.8
+                'text-opacity': 1
             },
             'minzoom': 4.3
         });
@@ -628,7 +616,7 @@ function addLayers() {
             'source-layer': 'Landsat8_Desc_filtr_Centro',
             'paint': {
                 'circle-color': 'hsl(207, 84%, 57%)',
-                'circle-opacity': 0.4,
+                'circle-opacity': 0.7,
                 'circle-radius': 21
             },
             'minzoom': 4.3
@@ -660,7 +648,7 @@ function addLayers() {
             },
             'paint': {
                 'text-color': 'hsl(0, 0%, 100%)',
-                'text-opacity': 0.8
+                'text-opacity': 1
             },
             'minzoom': 4.3
         });
