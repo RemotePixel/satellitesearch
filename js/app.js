@@ -168,7 +168,7 @@ function s2_name_to_key(scene) {
     const num = info[4];
 
     return [
-        tile_info.uz,
+        tile_info.uz.replace(/^0/, ''),
         tile_info.lb,
         tile_info.sq,
         acquisitionDate.slice(0,4),
