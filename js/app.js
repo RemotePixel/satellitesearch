@@ -126,9 +126,12 @@ function landsatdownload() {
     const params = { scene: $('#modalDownloadL8 .overview').attr('data-id') };
 
     let bands = $('#modalDownloadL8 .dropdown-menu li .on').parent().attr('data-bands');
+    let str_bands;
     if (bands === 'ndvi') {
+        str_bands = 'NDVI';
         params.ndvi = true;
     } else {
+        str_bands = `B${eval(bands).join('')}`;
         params.bands = bands;
     }
 
@@ -139,8 +142,9 @@ function landsatdownload() {
     })
         .fail(function () {
             $('#modalDownloadL8 button.btn-download').removeClass('processing');
-            $('#modalDownloadL8 button.btn-download').addClass('error');
-            $('#modalDownloadL8 button.btn-download span').text('Error');
+            $('#modalDownloadL8 button.btn-download').addClass('ready');
+            let path = `https://s3-us-west-2.amazonaws.com/remotepixel-us-west-2/data/landsat/${params.scene}_${str_bands}.tif`;
+            $('#modalDownloadL8 a.btn-download').attr('href', path);
         });
 }
 
@@ -242,7 +246,6 @@ function buildQueryAndRequestS2(features) {
 
                     let key = s2_name_to_key(scene.sceneID);
                     scene.browseURL = 'https://sentinel-s2-l1c.s3.amazonaws.com/tiles/' + key + '/preview.jpg';
-
                     if (results.hasOwnProperty(scene.grid)) {
                         results[scene.grid].push(scene);
                     } else {
@@ -315,8 +318,9 @@ function buildQueryAndRequestL8(features) {
 
                     if (moment(scene.date) < moment('2017-05-01')) {
                         scene.id = data.results[i].scene_id;
-                        scene.AWSurl = 'https://landsat-pds.s3.amazonaws.com/L8/' + zeroPad(data.results[i].path, 3) + '/' + zeroPad(data.results[i].row, 3) + '/' + data.results[i].id + '/';
-                        scene.sumAWSurl = 'https://landsatonaws.com/L8/' + zeroPad(data.results[i].path, 3) + '/' + zeroPad(data.results[i].row, 3) + '/' + data.results[i].sceneID;
+                        scene.id = scene.id.replace('LGN01', 'LGN00');
+                        scene.AWSurl = 'https://landsat-pds.s3.amazonaws.com/L8/' + zeroPad(data.results[i].path, 3) + '/' + zeroPad(data.results[i].row, 3) + '/' + scene.id + '/';
+                        scene.sumAWSurl = 'https://landsatonaws.com/L8/' + zeroPad(data.results[i].path, 3) + '/' + zeroPad(data.results[i].row, 3) + '/' + scene.id;
                     } else {
                         let scene_params = parse_landsat_product_id(scene.landsat_product_ID);
                         scene.collection = scene_params.collection;
@@ -489,7 +493,6 @@ function hoverS2(grid) {
 }
 
 function hoverL8(path, row) {
-    console.log(path,row);
     map.setFilter('L8_Highlighted', ['all', ['==', 'PATH', path], ['==', 'ROW', row]]);
 }
 
@@ -693,135 +696,133 @@ function addLayers() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// if (!mapboxgl.supported()) {
-//
-//     alert('Your browser does not support Mapbox GL');
-//     $('#modalGL').modal();
-//
-// } else {
+if (!mapboxgl.supported()) {
+    alert('Your browser does not support Mapbox GL');
+    $('#modalGL').modal();
+} else {
 
-var map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/satellite-streets-v9',
-    center: [-70.50, 40],
-    zoom: 2,
-    attributionControl: false,
-    minZoom: 2,
-    maxZoom: 9
-});
-
-map.addControl(new mapboxgl.NavigationControl(), 'top-left');
-map.dragRotate.disable();
-map.touchZoomRotate.disableRotation();
-
-const ctrl = document.getElementsByClassName('mapboxgl-ctrl-bottom-right')[0];
-const attr = document.createElement('div');
-
-attr.className = 'mapboxgl-ctrl-attrib mapboxgl-ctrl';
-ctrl.appendChild(attr);
-
-$('.mapboxgl-ctrl-attrib').append('<a href="https://remotepixel.ca" target="_blank">&copy; RemotePixel.ca</a>');
-$('.mapboxgl-ctrl-attrib').append('<a href="https://www.mapbox.com/about/maps/" target="_blank"> © Mapbox</a>');
-$('.mapboxgl-ctrl-attrib').append('<a href="http://www.openstreetmap.org/about/" target="_blank"> © OpenStreetMap</a>');
-$('.mapboxgl-ctrl-attrib').append('<a href="https://www.digitalglobe.com/" target="_blank"> © DigitalGlobe</a></div>');
-
-map.on('mousemove', function (e) {
-
-    if (document.getElementById('sat-checkbox').checked) {
-
-        const features = map.queryRenderedFeatures(e.point, {layers: ['S2_Grid']});
-
-        if (features.length !== 0) {
-            const pr = ['any'];
-            features.forEach(function (e) {
-                pr.push(['==', 'Name', e.properties.Name]);
-            });
-            map.setFilter('S2_Highlighted', pr);
-        } else {
-            map.setFilter('S2_Highlighted', ['in', 'Name', '']);
-        }
-
-    } else {
-
-        const features = map.queryRenderedFeatures(e.point, {layers: ['L8_Grid']});
-
-        if (features.length !== 0) {
-            const pr = ['any'];
-            features.forEach(function (e) {
-                pr.push(['all', ['==', 'PATH', e.properties.PATH], ['==', 'ROW', e.properties.ROW]]);
-            });
-            map.setFilter('L8_Highlighted', pr);
-        } else {
-            map.setFilter('L8_Highlighted', ['in', 'PATH', '']);
-        }
-    }
-});
-
-map.on('click', function (e) {
-
-    scope.results = {};
-
-    $('.spin').removeClass('display-none');
-
-    if (document.getElementById('sat-checkbox').checked) {
-        const features = map.queryRenderedFeatures(e.point, {layers: ['S2_Grid']});
-
-        if (features.length !== 0) {
-            const pr = ['any'];
-            features.forEach(function (e) {
-                pr.push(['==', 'Name', e.properties.Name]);
-            });
-            map.setFilter('S2_Selected', pr);
-            buildQueryAndRequestS2(features);
-        } else {
-            $('.spin').addClass('display-none');
-            map.setFilter('S2_Selected', ['in', 'Name', '']);
-        }
-
-    } else {
-
-        const features = map.queryRenderedFeatures(e.point, {layers: ['L8_Grid']});
-
-        if (features.length !== 0) {
-            const pr = ['any'];
-            features.forEach(function (e) {
-                pr.push(['all', ['==', 'PATH', e.properties.PATH], ['==', 'ROW', e.properties.ROW]]);
-            });
-            map.setFilter('L8_Selected', pr);
-            buildQueryAndRequestL8(features);
-        } else {
-            $('.spin').addClass('display-none');
-            map.setFilter('L8_Selected', ['in', 'PATH', '']);
-        }
-    }
-});
-
-map.on('load', function () {
-
-    map.addSource('sentinel', {
-        'type': 'vector',
-        'url': 'mapbox://vincentsarago.0qowxm38'
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/satellite-streets-v9',
+        center: [-70.50, 40],
+        zoom: 2,
+        attributionControl: false,
+        minZoom: 2,
+        maxZoom: 9
     });
 
-    map.addSource('sentinelcentro', {
-        'type': 'vector',
-        'url': 'mapbox://vincentsarago.29xm4q9t'
+    map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+    map.dragRotate.disable();
+    map.touchZoomRotate.disableRotation();
+
+    const ctrl = document.getElementsByClassName('mapboxgl-ctrl-bottom-right')[0];
+    const attr = document.createElement('div');
+
+    attr.className = 'mapboxgl-ctrl-attrib mapboxgl-ctrl';
+    ctrl.appendChild(attr);
+
+    $('.mapboxgl-ctrl-attrib').append('<a href="https://remotepixel.ca" target="_blank">&copy; RemotePixel.ca</a>');
+    $('.mapboxgl-ctrl-attrib').append('<a href="https://www.mapbox.com/about/maps/" target="_blank"> © Mapbox</a>');
+    $('.mapboxgl-ctrl-attrib').append('<a href="http://www.openstreetmap.org/about/" target="_blank"> © OpenStreetMap</a>');
+    $('.mapboxgl-ctrl-attrib').append('<a href="https://www.digitalglobe.com/" target="_blank"> © DigitalGlobe</a></div>');
+
+    map.on('mousemove', function (e) {
+
+        if (document.getElementById('sat-checkbox').checked) {
+
+            const features = map.queryRenderedFeatures(e.point, {layers: ['S2_Grid']});
+
+            if (features.length !== 0) {
+                const pr = ['any'];
+                features.forEach(function (e) {
+                    pr.push(['==', 'Name', e.properties.Name]);
+                });
+                map.setFilter('S2_Highlighted', pr);
+            } else {
+                map.setFilter('S2_Highlighted', ['in', 'Name', '']);
+            }
+
+        } else {
+
+            const features = map.queryRenderedFeatures(e.point, {layers: ['L8_Grid']});
+
+            if (features.length !== 0) {
+                const pr = ['any'];
+                features.forEach(function (e) {
+                    pr.push(['all', ['==', 'PATH', e.properties.PATH], ['==', 'ROW', e.properties.ROW]]);
+                });
+                map.setFilter('L8_Highlighted', pr);
+            } else {
+                map.setFilter('L8_Highlighted', ['in', 'PATH', '']);
+            }
+        }
     });
 
-    map.addSource('landsat', {
-        'type': 'vector',
-        'url': 'mapbox://vincentsarago.8ib6ynrs'
+    map.on('click', function (e) {
+
+        scope.results = {};
+
+        $('.spin').removeClass('display-none');
+
+        if (document.getElementById('sat-checkbox').checked) {
+            const features = map.queryRenderedFeatures(e.point, {layers: ['S2_Grid']});
+
+            if (features.length !== 0) {
+                const pr = ['any'];
+                features.forEach(function (e) {
+                    pr.push(['==', 'Name', e.properties.Name]);
+                });
+                map.setFilter('S2_Selected', pr);
+                buildQueryAndRequestS2(features);
+            } else {
+                $('.spin').addClass('display-none');
+                map.setFilter('S2_Selected', ['in', 'Name', '']);
+            }
+
+        } else {
+
+            const features = map.queryRenderedFeatures(e.point, {layers: ['L8_Grid']});
+
+            if (features.length !== 0) {
+                const pr = ['any'];
+                features.forEach(function (e) {
+                    pr.push(['all', ['==', 'PATH', e.properties.PATH], ['==', 'ROW', e.properties.ROW]]);
+                });
+                map.setFilter('L8_Selected', pr);
+                buildQueryAndRequestL8(features);
+            } else {
+                $('.spin').addClass('display-none');
+                map.setFilter('L8_Selected', ['in', 'PATH', '']);
+            }
+        }
     });
 
-    map.addSource('landsatcentro', {
-        'type': 'vector',
-        'url': 'mapbox://vincentsarago.9sh46kql'
-    });
+    map.on('load', function () {
 
-    addLayers();
-    $('.loading-map').addClass('off');
-});
-// }
+        map.addSource('sentinel', {
+            'type': 'vector',
+            'url': 'mapbox://vincentsarago.0qowxm38'
+        });
+
+        map.addSource('sentinelcentro', {
+            'type': 'vector',
+            'url': 'mapbox://vincentsarago.29xm4q9t'
+        });
+
+        map.addSource('landsat', {
+            'type': 'vector',
+            'url': 'mapbox://vincentsarago.8ib6ynrs'
+        });
+
+        map.addSource('landsatcentro', {
+            'type': 'vector',
+            'url': 'mapbox://vincentsarago.9sh46kql'
+        });
+
+        addLayers();
+        $('.loading-map').addClass('off');
+    });
+}
 
 $(document).ready(function () {
     $('#twitter').attr('href',
