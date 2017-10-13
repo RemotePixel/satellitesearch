@@ -241,11 +241,11 @@ function buildQueryAndRequestS2(features) {
                     scene.sceneID = data.results[i].scene_id;
                     scene.browseURL = data.results[i].thumbnail.replace('.jp2', '.jpg');
                     scene.path = data.results[i].aws_path.replace('tiles', '#tiles');
-                    scene.AWSurl = 'https://sentinel-s2-l1c.s3-website.eu-central-1.amazonaws.com/' + scene.path + '/';
+                    scene.AWSurl = 'http://sentinel-s2-l1c.s3-website.eu-central-1.amazonaws.com/' + scene.path + '/';
                     scene.grid = scene.utm_zone + scene.latitude_band + scene.grid_square;
 
                     let key = s2_name_to_key(scene.sceneID);
-                    scene.browseURL = 'https://sentinel-s2-l1c.s3.amazonaws.com/tiles/' + key + '/preview.jpg';
+                    scene.browseURL = 'http://sentinel-s2-l1c.s3.amazonaws.com/tiles/' + key + '/preview.jpg';
                     if (results.hasOwnProperty(scene.grid)) {
                         results[scene.grid].push(scene);
                     } else {
@@ -399,7 +399,7 @@ function feedPreviewS2(elem) {
 function feeddownloadS2(elem) {
 
     const key = s2_name_to_key(elem);
-    const aws_s2_url = 'https://sentinel-s2-l1c.s3.amazonaws.com/tiles/' + key;
+    const aws_s2_url = 'http://sentinel-s2-l1c.s3.amazonaws.com/tiles/' + key;
 
     $('#modalDownloadS2 .overview').attr('data-id', elem);
     $('#modalDownloadS2 .overview').attr('data-prev', aws_s2_url + '/preview.jpg');
